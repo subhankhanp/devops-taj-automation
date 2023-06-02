@@ -23,16 +23,14 @@
       copy:
         src: /var/lib/jenkins/workspace/sshkey1
         dest: /home/ubuntu/.ssh/id_rsa
-
+    - name: Updating apt cache
+      command: sudo apt update -y
 
     - name: Installing mysql-client-core-8.0
       command: sudo apt install mysql-client-core-8.0 -y
 
     - name: Installing libmysqlclient-dev
       command: sudo apt-get install libmysqlclient-dev -y
-
-    - name: Updating apt cache
-      command: sudo apt update -y
 
     - name: Installing redis-tools
       command: sudo apt-get install redis-tools -y
