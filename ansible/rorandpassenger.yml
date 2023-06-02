@@ -1,0 +1,126 @@
+---
+- name: This sets up ROR and passenger with nginx module
+  hosts: aws_ec2
+  become: yes
+  remote_user: ubuntu
+  gather_facts: true
+  vars:
+    ansible_ssh_private_key_file: "/etc/ansible/staging-qa.pem"  
+    ansible_ssh_user: "ubuntu"
+
+  tasks:
+#    - name: Install libmysqlclient-dev
+#      command: sudo apt-get install default-libmysqlclient-dev -y
+
+    - name: Install mysql-client-core-8.0
+      command: sudo apt install mysql-client-core-8.0 -y
+
+    - name: Update apt cache
+      command: sudo apt update -y
+    - name: Install redis-tools
+      command: sudo apt-get install redis-tools -y
+
+    - name: Install gnupg2
+      command: sudo apt install gnupg2 -y
+    - name: Import GPG keys
+      shell: gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+
+    - name: Install RVM (Ruby Version Manager)
+      shell: \curl -sSL https://get.rvm.io | bash -s stable
+      args:
+        executable: /bin/bash
+
+    - name: Set up RVM environment
+      shell: source ~/.rvm/scripts/rvm && rvm requirements
+      args:
+        executable: /bin/bash
+
+#    - name: Install RVM requirements
+#      shell: rvm requirements
+
+    - name: Create .rvmrc file
+      lineinfile:
+        path: ~/.rvmrc
+        line: "rvm_gemset_create_on_use_flag=1"
+        create: yes
+
+    - name: Install Ruby 2.6.5
+      shell: source ~/.rvm/scripts/rvm && rvm install ruby-2.6.5
+      args:
+        executable: /bin/bash
+
+    - name: Install Node.js
+      command: sudo apt install nodejs -y
+    - name: Install additional packages
+      apt:
+        name:
+          - gcc
+          - g++
+          - make
+        state: present
+
+    - name: Import Yarn GPG key
+      shell: curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
+
+    - name: Add Yarn APT repository
+#      copy:
+#        dest: sudo /etc/apt/sources.list.d/yarn.list
+#        content: "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main"
+      lineinfile:
+        path: /etc/apt/sources.list.d/yarn.list
+        line: "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main"
+        create: yes
+      become_user: root
+
+    - name: Update apt cache and install Yarn
+      apt:
+        update_cache: yes
+        name: yarn
+        state: present
+      become_user: root
+
+
+    - name: install nginx
+      command: sudo apt install nginx -y
+
+    - name: install packages
+      command: sudo apt-get install -y dirmngr gnupg apt-transport-https ca-certificates
+
+    - name: Add Phusion Passenger GPG key
+      command: sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7
+
+    - name: add apt repository
+      command: sudo sh -c 'echo deb https://oss-binaries.phusionpassenger.com/apt/passenger focal main > /etc/apt/sources.list.d/passenger.list'
+
+    - name: get update
+      command: sudo apt-get update
+
+    - name: install passenger-nginx-module
+      command: sudo apt-get install -y libnginx-mod-http-passenger
+
+    - name: Create symlink for Passenger module
+      command: ln -s /usr/share/nginx/modules-available/mod-http-passenger.load /etc/nginx/modules-enabled/50-mod-http-passenger.conf
+      args:
+        creates: /etc/nginx/modules-enabled/50-mod-http-passenger.conf
+      notify: Restart Nginx
+
+    - name: Check mod-http-passenger.conf file
+      shell: ls /etc/nginx/conf.d/mod-http-passenger.conf
+      register: mod_http_passenger_conf
+      changed_when: false
+    - debug:
+        var: mod_http_passenger_conf
+
+    - name: Add Passenger configuration to mod-http-passenger.conf
+      lineinfile:
+        path: /etc/nginx/conf.d/mod-http-passenger.conf
+        line: |
+          passenger_root /usr/lib/ruby/vendor_ruby/phusion_passenger/locations.ini;
+          passenger_ruby /usr/bin/passenger_free_ruby;
+        create: yes
+      when: mod_http_passenger_conf.stdout == ""
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
