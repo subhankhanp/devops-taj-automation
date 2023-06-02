@@ -16,6 +16,6 @@ resource "aws_instance" "rorserver" {
   # Optional: Customize the instance tags
   tags = {
     Environment = "staging"
-    Name = "${var.name}-server"
+    Name = "${var.name}-taj"
   }
 }
