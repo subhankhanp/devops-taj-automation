@@ -50,6 +50,12 @@
       shell: source /home/ubuntu/.rvm/scripts/rvm && rvm requirements
       args:
         executable: /bin/bash
+
+    - name: Creating RVM gemset
+      shell: rvm ruby-2.6.5 do rvm gemset create ts-gds
+      args:
+        executable: /bin/bash
+
     - name: Creating RVM gemset
       shell: source /home/ubuntu/.rvm/bin/rvm ruby-2.6.5@ts-gds do gem install bundler -v 2.2.24
       args:
