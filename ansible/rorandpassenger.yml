@@ -9,32 +9,41 @@
     ansible_ssh_private_key_file: "/etc/ansible/staging-qa.pem"
     ansible_ssh_user: "ubuntu"
   tasks:
-#    - name: Install libmysqlclient-dev
-#      command: sudo apt-get install default-libmysqlclient-dev -y
-
-    - name: Generate SSH key
+    - name: Generating SSH key
       ansible.builtin.command: ssh-keygen -t rsa -b 4096 -N '' -f ~/.ssh/id_rsa
       args:
         creates: ~/.ssh/id_rsa
-    - name: copy ssh to ansible to target node
+
+    - name: copying ssh to ansible to target node
       copy:
         src: /var/lib/jenkins/workspace/sshkey
         dest: /home/ubuntu/.ssh/id_rsa.pub 
 
-    - name: Install mysql-client-core-8.0
+    - name: copying ssh to ansible to target node
+      copy:
+        src: /var/lib/jenkins/workspace/sshkey1
+        dest: /home/ubuntu/.ssh/id_rsa
+
+
+    - name: Installing mysql-client-core-8.0
       command: sudo apt install mysql-client-core-8.0 -y
 
-    - name: Update apt cache
+    - name: Installing libmysqlclient-dev
+      command: sudo apt-get install default-libmysqlclient-dev -y
+
+    - name: Updating apt cache
       command: sudo apt update -y
-    - name: Install redis-tools
+
+    - name: Installing redis-tools
       command: sudo apt-get install redis-tools -y
 
-    - name: Install gnupg2
+    - name: Installing gnupg2
       command: sudo apt install gnupg2 -y
-    - name: Import GPG keys
+
+    - name: Importing GPG keys
       shell: gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
 
-    - name: Install RVM (Ruby Version Manager)
+    - name: Installing RVM (Ruby Version Manager)
       shell: \curl -sSL https://get.rvm.io | bash -s stable
       args:
         executable: /bin/bash
@@ -43,8 +52,10 @@
       shell: source /home/ubuntu/.rvm/scripts/rvm && rvm requirements
       args:
         executable: /bin/bash
-#    - name: Install RVM requirements
-#      shell: rvm requirements
+    - name: Creating RVM gemset
+      shell: source /home/ubuntu/.rvm/bin/rvm ruby-2.6.5@ts-gds do gem install bundler -v 2.2.24
+      args:
+        executable: /bin/bash
 
     - name: Create .rvmrc file
       lineinfile:
@@ -66,6 +77,13 @@
           - g++
           - make
         state: present
+
+    - name: install build-essential libcurl4-openssl-dev
+      command: sudo apt-get -y install build-essential libcurl4-openssl-dev
+
+    - name: install libxml2-dev
+      command: sudo apt-get -y install libxml2-dev
+
 
     - name: Import Yarn GPG key
       shell: curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
@@ -127,7 +145,8 @@
           passenger_ruby /usr/bin/passenger_free_ruby;
         create: yes
       when: mod_http_passenger_conf.stdout == ""
-
+    - name: deleting default file
+      command: sudo rm -rf /etc/nginx/sites-available/default
 
   handlers:
     - name: Restart Nginx
