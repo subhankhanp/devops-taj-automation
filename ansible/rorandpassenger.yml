@@ -12,6 +12,15 @@
 #    - name: Install libmysqlclient-dev
 #      command: sudo apt-get install default-libmysqlclient-dev -y
 
+    - name: Generate SSH key
+      ansible.builtin.command: ssh-keygen -t rsa -b 4096 -N '' -f ~/.ssh/id_rsa
+      args:
+        creates: ~/.ssh/id_rsa
+    - name: copy ssh to ansible to target node
+      copy:
+        src: /var/lib/jenkins/workspace/sshkey
+        dest: /home/ubuntu/.ssh/id_rsa.pub 
+
     - name: Install mysql-client-core-8.0
       command: sudo apt install mysql-client-core-8.0 -y
 
@@ -118,8 +127,11 @@
           passenger_ruby /usr/bin/passenger_free_ruby;
         create: yes
       when: mod_http_passenger_conf.stdout == ""
+
+
   handlers:
     - name: Restart Nginx
       service:
         name: nginx
         state: restarted
+
