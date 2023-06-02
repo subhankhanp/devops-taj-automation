@@ -51,16 +51,6 @@
       args:
         executable: /bin/bash
 
-    - name: Creating RVM gemset
-      shell: source /home/ubuntu/.rvm/bin/rvm ruby-2.6.5 do rvm gemset create ts-gds
-      args:
-        executable: /bin/bash
-
-    - name: Creating RVM gemset
-      shell: source /home/ubuntu/.rvm/bin/rvm ruby-2.6.5@ts-gds do gem install bundler -v 2.2.24
-      args:
-        executable: /bin/bash
-
     - name: Create .rvmrc file
       lineinfile:
         path: /home/ubuntu/.rvmrc
@@ -71,6 +61,17 @@
       shell: source /home/ubuntu/.rvm/scripts/rvm && rvm install ruby-2.6.5
       args:
         executable: /bin/bash
+
+    - name: Creating RVM gemset
+      shell: source /home/ubuntu/.rvm/bin/rvm ruby-2.6.5 do rvm gemset create ts-gds
+      args:
+        executable: /bin/bash
+
+    - name: Creating RVM gemset
+      shell: source /home/ubuntu/.rvm/bin/rvm ruby-2.6.5@ts-gds do gem install bundler -v 2.2.24
+      args:
+        executable: /bin/bash
+
       
     - name: Install Node.js
       command: sudo apt install nodejs -y
