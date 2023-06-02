@@ -29,7 +29,7 @@
       command: sudo apt install mysql-client-core-8.0 -y
 
     - name: Installing libmysqlclient-dev
-      command: sudo apt-get install default-libmysqlclient-dev -y
+      command: sudo apt-get install libmysqlclient-dev -y
 
     - name: Updating apt cache
       command: sudo apt update -y
