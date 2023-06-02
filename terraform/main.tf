@@ -3,6 +3,7 @@ resource "aws_instance" "rorserver" {
   ami           = "ami-002843b0a9e09324a"  # Replace with your desired AMI ID
   instance_type = "m5.xlarge"      # Replace with your desired instance type
   key_name      = "staging-qa"   # Replace with your desired key pair name
+  iam_instance_profile = "ec2-ssm"
 
   vpc_security_group_ids = ["sg-037cf4fdd30490855"]  # Replace with your existing security group ID
 
