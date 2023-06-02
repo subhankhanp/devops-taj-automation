@@ -4,6 +4,7 @@
   become: yes
   remote_user: ubuntu
   gather_facts: true
+  become_user: ubuntu
   vars:
     ansible_ssh_private_key_file: "/etc/ansible/staging-qa.pem"
     ansible_ssh_user: "ubuntu"
@@ -28,12 +29,11 @@
       shell: \curl -sSL https://get.rvm.io | bash -s stable
       args:
         executable: /bin/bash
-
+      
     - name: Set up RVM environment
       shell: source /home/ubuntu/.rvm/scripts/rvm && rvm requirements
       args:
         executable: /bin/bash
-
 #    - name: Install RVM requirements
 #      shell: rvm requirements
 
@@ -47,7 +47,7 @@
       shell: source /home/ubuntu/.rvm/scripts/rvm && rvm install ruby-2.6.5
       args:
         executable: /bin/bash
-
+      
     - name: Install Node.js
       command: sudo apt install nodejs -y
     - name: Install additional packages
