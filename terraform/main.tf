@@ -13,9 +13,6 @@ resource "aws_instance" "rorserver" {
     volume_size           = 50  # Replace with your desired volume size in GB
     delete_on_termination = true
 }
-  provisioner "local-exec" {
-    command = "aws ec2 describe-instances --instance-ids ${self.id} --query 'Reservations[0].Instances[0].InstanceId' --output text > instance_id.tpl"
-  }
   # Optional: Customize the instance tags
   tags = {
     Environment = "staging"
@@ -23,12 +20,9 @@ resource "aws_instance" "rorserver" {
   }
 }
 
-data "template_file" "instance_id" {
-  template = file("instance_id.tpl")
-}
-
 
 resource "aws_lb_target_group_attachment" "rortg" {
   target_group_arn = "arn:aws:elasticloadbalancing:ap-southeast-1:992805018141:targetgroup/gds-ind-qa1/942b294902806219"
-  target_id        = data.template_file.instance_id.rendered
+  target_id        = aws_instance.rorserver.id
+  port             = 80
 }
