@@ -52,7 +52,7 @@
         executable: /bin/bash
 
     - name: Creating RVM gemset
-      shell: rvm ruby-2.6.5 do rvm gemset create ts-gds
+      shell: source /home/ubuntu/.rvm/bin/rvm rvm ruby-2.6.5 do rvm gemset create ts-gds
       args:
         executable: /bin/bash
 
