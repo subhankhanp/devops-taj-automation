@@ -23,12 +23,12 @@ resource "aws_instance" "rorserver" {
   }
 }
 
-data "template_file" "instanceid" {
+data "template_file" "instance_id" {
   template = file("instance_id.tpl")
 }
 
 
 resource "aws_lb_target_group_attachment" "rortg" {
   target_group_arn = "arn:aws:elasticloadbalancing:ap-southeast-1:992805018141:targetgroup/gds-ind-qa1/942b294902806219"
-  target_id        = data.template_file.instanceid.rendered
+  target_id        = data.template_file.instance_id.rendered
 }
