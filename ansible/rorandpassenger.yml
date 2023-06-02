@@ -152,6 +152,8 @@
       when: mod_http_passenger_conf.stdout == ""
     - name: deleting default file
       command: sudo rm -rf /etc/nginx/sites-enabled/default
+    - name: deleting default file
+      command: sudo rm -rf /etc/nginx/sites-available/default
 
   handlers:
     - name: Restart Nginx
