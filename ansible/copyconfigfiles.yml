@@ -1,0 +1,19 @@
+---
+- name: Copying the application config files
+  hosts: aws_ec2
+  become: yes
+  remote_user: ubuntu
+  gather_facts: true
+  become_user: ubuntu
+  vars:
+    ansible_ssh_private_key_file: "/etc/ansible/staging-qa.pem"
+    ansible_ssh_user: "ubuntu"
+  tasks:
+    - name: copy a file
+      copy:
+        src: /var/lib/jenkins/workspace/configfiles/config
+        dest: /home/ubuntu/app/gds-stg.ticketsimply.co.in/shared
+    - name: another file to copy
+      copy:
+        src: /var/lib/jenkins/workspace/configfiles/apminsight.conf
+        dest: /home/ubuntu/app/gds-stg.ticketsimply.co.in/shared
