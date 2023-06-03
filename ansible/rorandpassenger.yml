@@ -150,10 +150,17 @@
           passenger_ruby /usr/bin/passenger_free_ruby;
         create: yes
       when: mod_http_passenger_conf.stdout == ""
+
     - name: deleting default file
       command: sudo rm -rf /etc/nginx/sites-enabled/default
+
     - name: deleting default file
       command: sudo rm -rf /etc/nginx/sites-available/default
+
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
 
   handlers:
     - name: Restart Nginx
