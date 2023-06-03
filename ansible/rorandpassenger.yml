@@ -157,11 +157,6 @@
     - name: deleting default file
       command: sudo rm -rf /etc/nginx/sites-available/default
 
-    - name: Restart Nginx
-      service:
-        name: nginx
-        state: restarted
-
   handlers:
     - name: Restart Nginx
       service:
