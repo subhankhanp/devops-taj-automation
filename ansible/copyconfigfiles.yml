@@ -17,3 +17,9 @@
       copy:
         src: /var/lib/jenkins/workspace/configfiles/apminsight.conf
         dest: /home/ubuntu/app/gds-stg.ticketsimply.co.in/shared
+
+#    - name: deleting default file
+#      command: sudo rm -rf /etc/nginx/sites-enabled/default
+
+#    - name: deleting default file
+#      command: sudo rm -rf /etc/nginx/sites-available/default
